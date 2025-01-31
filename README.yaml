@@ -1,23 +1,65 @@
-name: "template"
+name: "aws-tgw-attachment"
 
 # Canonical GitHub repo
-github_repo: "cloudposse-terraform-components/template"
+github_repo: "cloudposse-terraform-components/aws-tgw-attachment"
 
 # Short description of this project
 description: |-
-  Description of this component
+  This component creates a Transit Gateway VPC Attachment and optionally creates an association with a Transit Gateway Route Table.
 
 usage: |-
   **Stack Level**: Regional or Test47
 
   Here's an example snippet for how to use this component.
-  
+
   ```yaml
   components:
     terraform:
-      foo:
+      tgw/attachment:
         vars:
           enabled: true
+          transit_gateway_id: !terraform.output tgw/hub core-use1-network transit_gateway_id
+          transit_gateway_route_table_id: !terraform.output tgw/hub core-use1-network transit_gateway_route_table_id
+          create_transit_gateway_route_table_association: false
+  ```
+
+  #### Transit Gateway Route Table Association
+
+  If you have a Transit Gateway Route Table, you can create an association with the Transit Gateway VPC Attachment. This is necessary for attachments in the _same account_ as the Transit Gateway Route Table. For example, if you have a Transit Gateway Route Table in the _core_ account, you will need to create an association for each of the VPCs in the _core_ account.
+
+  ```yaml
+  # core-network stack
+  components:
+    terraform:
+      tgw/attachment:
+        vars:
+          enabled: true
+          transit_gateway_id: !terraform.output tgw/hub core-use1-network transit_gateway_id
+          transit_gateway_route_table_id: !terraform.output tgw/hub core-use1-network transit_gateway_route_table_id
+          create_transit_gateway_route_table_association: true
+  ```
+
+  #### Additional Associations
+
+  If you have peered connections to other VPCs, you may need to create associations for each of those VPCs. You typically need these associations created in the same account as the peered Transit Gateway.
+
+  ```yaml
+  # core-usw2-network stack (example alternative region)
+  components:
+    terraform:
+      tgw/attachment:
+        vars:
+          enabled: true
+          transit_gateway_id: !terraform.output tgw/hub core-usw2-network transit_gateway_id
+          transit_gateway_route_table_id: !terraform.output tgw/hub core-usw2-network transit_gateway_route_table_id
+          create_transit_gateway_route_table_association: true
+
+          # Add associations for the peered VPCs' Transit Gateway Attachments
+          additional_associations:
+            - attachment_id: !terraform.output tgw/attachment plat-usw2-dev transit_gateway_attachment_id
+              route_table_id: !terraform.output tgw/hub transit_gateway_route_table_id
+            - attachment_id: !terraform.output tgw/attachment plat-usw2-prod transit_gateway_attachment_id
+              route_table_id: !terraform.output tgw/hub transit_gateway_route_table_id
   ```
 
 include:
