@@ -66,24 +66,10 @@ components:
 
 If you have a Transit Gateway Route Table, you can create an association with the Transit Gateway VPC Attachment. This is necessary for attachments in the _same account_ as the Transit Gateway Route Table. For example, if you have a Transit Gateway Route Table in the _core_ account, you will need to create an association for each of the VPCs in the _core_ account.
 
+For any connected VPC to this account, you need to create an association with the Transit Gateway Route Table.
+
 ```yaml
 # core-network stack
-components:
-  terraform:
-    tgw/attachment:
-      vars:
-        enabled: true
-        transit_gateway_id: !terraform.output tgw/hub core-use1-network transit_gateway_id
-        transit_gateway_route_table_id: !terraform.output tgw/hub core-use1-network transit_gateway_route_table_id
-        create_transit_gateway_route_table_association: true
-```
-
-#### Additional Associations
-
-If you have peered connections to other VPCs, you may need to create associations for each of those VPCs. You typically need these associations created in the same account as the peered Transit Gateway.
-
-```yaml
-# core-usw2-network stack (example alternative region)
 components:
   terraform:
     tgw/attachment:
@@ -93,7 +79,7 @@ components:
         transit_gateway_route_table_id: !terraform.output tgw/hub core-usw2-network transit_gateway_route_table_id
         create_transit_gateway_route_table_association: true
 
-        # Add associations for the peered VPCs' Transit Gateway Attachments
+        # Include association for each of the connected account
         additional_associations:
           - attachment_id: !terraform.output tgw/attachment plat-usw2-dev transit_gateway_attachment_id
             route_table_id: !terraform.output tgw/hub transit_gateway_route_table_id
