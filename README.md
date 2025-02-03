@@ -64,7 +64,7 @@ components:
 
 #### Transit Gateway Route Table Association
 
-If you have a Transit Gateway Route Table, you can create an association with the Transit Gateway VPC Attachment. This is necessary for attachments in the _same account_ as the Transit Gateway Route Table. For example, if you have a Transit Gateway Route Table in the _core_ account, you will need to create an association for each of the VPCs in the _core_ account.
+If you have a Transit Gateway Route Table, you can create an association with the Transit Gateway VPC Attachment. This is necessary for attachments in the _same account_ as the Transit Gateway Route Table. For example, if you have a Transit Gateway Route Table in the _core-network_ account, you will need to create an association for each of the VPCs in the _core-network_ account.
 
 For any connected VPC to this account, you need to create an association with the Transit Gateway Route Table.
 
