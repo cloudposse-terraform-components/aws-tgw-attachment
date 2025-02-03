@@ -47,7 +47,7 @@ This component creates a Transit Gateway VPC Attachment and optionally creates a
 
 ## Usage
 
-**Stack Level**: Regional or Test47
+**Stack Level**: Regional
 
 Here's an example snippet for how to use this component.
 
@@ -64,9 +64,9 @@ components:
 
 #### Transit Gateway Route Table Association
 
-If you have a Transit Gateway Route Table, you can create an association with the Transit Gateway VPC Attachment. This is necessary for attachments in the _same account_ as the Transit Gateway Route Table. For example, if you have a Transit Gateway Route Table in the _core-network_ account, you will need to create an association for each of the VPCs in the _core-network_ account.
+In the primary account, the account that has the Transit Gateway and the Transit Gateway Route Table, we need to create an association with the Transit Gateway Route Table. This is necessary for attachments in the _same account_ as the Transit Gateway Route Table. For example, if you have a Transit Gateway Route Table in the _core-network_ account, you will need to create an association for each of the VPCs in the _core-network_ account.
 
-For any connected VPC to this account, you need to create an association with the Transit Gateway Route Table.
+The intention is to have all configuration for a given account in the same stack as that account. For example, since the Transit Gateway Route Table is in the _core-network_ account, we would create all necessary associations in the _core-network_ account.
 
 ```yaml
 # core-network stack
@@ -77,15 +77,35 @@ components:
         enabled: true
         transit_gateway_id: !terraform.output tgw/hub core-usw2-network transit_gateway_id
         transit_gateway_route_table_id: !terraform.output tgw/hub core-usw2-network transit_gateway_route_table_id
+
+        # Add an association for this account itself
         create_transit_gateway_route_table_association: true
 
-        # Include association for each of the connected account
+        # Include association for each of the connected accounts, if necessary
         additional_associations:
           - attachment_id: !terraform.output tgw/attachment plat-usw2-dev transit_gateway_attachment_id
             route_table_id: !terraform.output tgw/hub transit_gateway_route_table_id
           - attachment_id: !terraform.output tgw/attachment plat-usw2-prod transit_gateway_attachment_id
             route_table_id: !terraform.output tgw/hub transit_gateway_route_table_id
 ```
+
+In connected accounts, an account that does _not_ have a Transit Gateway and Transit Gateway Route Table, you do not need to create any associations.
+
+```yaml
+# plat-dev stack
+components:
+  terraform:
+    tgw/attachment:
+      vars:
+        enabled: true
+        transit_gateway_id: !terraform.output tgw/hub core-usw2-network transit_gateway_id
+        transit_gateway_route_table_id: !terraform.output tgw/hub core-usw2-network transit_gateway_route_table_id
+
+        # Do not create an association in this account since there is no Transit Gateway Route Table in this account.
+        create_transit_gateway_route_table_association: false
+```
+
+Plus the same for all other connected accounts.
 
 > [!IMPORTANT]
 > In Cloud Posse's examples, we avoid pinning modules to specific versions to prevent discrepancies between the documentation
