@@ -25,7 +25,7 @@ usage: |-
 
   #### Transit Gateway Route Table Association
 
-  In the primary account, the account that has the Transit Gateway and the Transit Gateway Route Table, we need to create an association with the Transit Gateway Route Table. This is necessary for attachments in the _same account_ as the Transit Gateway Route Table. For example, if you have a Transit Gateway Route Table in the _core-network_ account, you will need to create an association for each of the VPCs in the _core-network_ account.
+  In the primary account, the account that has the Transit Gateway and the Transit Gateway Route Table, we need to create an association with the Transit Gateway Route Table. This is necessary for attachments to connect to the Transit Gateway Route Table. For example, if you have a Transit Gateway Route Table in the _core-network_ account, you will need to create an association for each VPCs connected to that Transit Gateway Route Table.
 
   The intention is to have all configuration for a given account in the same stack as that account. For example, since the Transit Gateway Route Table is in the _core-network_ account, we would create all necessary associations in the _core-network_ account.
 
