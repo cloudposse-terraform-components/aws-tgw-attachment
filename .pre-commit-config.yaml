@@ -31,4 +31,4 @@ repos:
       - id: terraform_tflint
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
-        exclude: "context.tf$"
+        exclude: "(context|providers).tf$"
