@@ -27,23 +27,3 @@ module "standard_vpc_attachment" {
 
   context = module.this.context
 }
-
-locals {
-  # Combine external associations with local VPC attachment if enabled
-  associations = var.create_transit_gateway_route_table_association ? concat([
-    {
-      attachment_id  = module.standard_vpc_attachment.transit_gateway_vpc_attachment_ids["this"]
-      route_table_id = var.transit_gateway_route_table_id
-    }
-  ], var.additional_associations) : var.additional_associations
-}
-
-# We need to create the association for each of the connected SDLC accounts and for this account itself
-resource "aws_ec2_transit_gateway_route_table_association" "this" {
-  for_each = module.this.enabled ? {
-    for assoc in local.associations : assoc.attachment_id => assoc
-  } : {}
-
-  transit_gateway_attachment_id  = each.key
-  transit_gateway_route_table_id = each.value.route_table_id
-}
