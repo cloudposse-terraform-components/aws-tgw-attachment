@@ -144,9 +144,7 @@ components:
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | < 7.0.0 |
+No providers.
 
 ## Modules
 
