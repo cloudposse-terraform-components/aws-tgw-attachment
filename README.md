@@ -126,7 +126,7 @@ Plus the same for all other connected accounts.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | < 7.0.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.1, < 6.0.0 |
 
 ## Providers
 
@@ -323,7 +323,7 @@ Copyright © 2017-2025 [Cloud Posse, LLC](https://cpco.io/copyright)
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | < 7.0.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.1, < 6.0.0 |
 
 ## Providers
 
