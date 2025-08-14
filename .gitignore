@@ -29,6 +29,7 @@ aws-assumed-role/
 **/*.helmfile.vars.yaml
 **/crash.log
 **/secrets/
+.atmos/cache.yaml
 
 # Module directory
 # Note that the leading "**/" appears necessary for Docker even if not for Git
