@@ -144,20 +144,24 @@ components:
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.1, < 6.0.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_iam_roles"></a> [iam\_roles](#module\_iam\_roles) | ../../account-map/modules/iam-roles | n/a |
-| <a name="module_standard_vpc_attachment"></a> [standard\_vpc\_attachment](#module\_standard\_vpc\_attachment) | cloudposse/transit-gateway/aws | 0.12.0 |
+| <a name="module_standard_vpc_attachment"></a> [standard\_vpc\_attachment](#module\_standard\_vpc\_attachment) | cloudposse/transit-gateway/aws | 0.11.3 |
 | <a name="module_this"></a> [this](#module\_this) | cloudposse/label/null | 0.25.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | cloudposse/stack-config/yaml//modules/remote-state | 1.8.0 |
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [aws_ec2_transit_gateway_route_table_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route_table_association) | resource |
 
 ## Inputs
 
