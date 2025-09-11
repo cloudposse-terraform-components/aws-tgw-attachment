@@ -1,140 +1,83 @@
 ---
 tags:
-  - component/tgw/attachment
-  - layer/network
-  - provider/aws
+  - terraform
+  - terraform-modules
+  - aws
+  - components
+  - terraform-components
+  - root
+  - geodesic
+  - reference-implementation
+  - reference-architecture
 ---
 
-# Component: `tgw/attachment`
+# Component: `tgw-attachment`
 
-This component is responsible for provisioning an AWS Transit Gateway VPC attachment and managing its route table associations. It enables VPCs to connect to a Transit Gateway for inter-VPC communication.
-
+This component creates a Transit Gateway VPC Attachment and optionally creates an association with a Transit Gateway Route Table.
 ## Usage
 
 **Stack Level**: Regional
 
-This component is deployed to each region where VPCs need to be attached to a Transit Gateway.
-
-### Basic Example
-
-Here's a simple example using physical IDs:
+Here's an example snippet for how to use this component.
 
 ```yaml
 components:
   terraform:
     tgw/attachment:
       vars:
-        transit_gateway_id: "tgw-0123456789abcdef0"
-        transit_gateway_route_table_id: "tgw-rtb-0123456789abcdef0"
+        enabled: true
+        transit_gateway_id: !terraform.output tgw/hub core-use1-network transit_gateway_id
+        transit_gateway_route_table_id: !terraform.output tgw/hub core-use1-network transit_gateway_route_table_id
         create_transit_gateway_route_table_association: false
 ```
 
-The same configuration using terraform outputs:
+#### Transit Gateway Route Table Association
+
+In the primary account, the account that has the Transit Gateway and the Transit Gateway Route Table, we need to create an association with the Transit Gateway Route Table. This is necessary for attachments to connect to the Transit Gateway Route Table. For example, if you have a Transit Gateway Route Table in the _core-network_ account, you will need to create an association for each VPCs connected to that Transit Gateway Route Table.
+
+The intention is to have all configuration for a given account in the same stack as that account. For example, since the Transit Gateway Route Table is in the _core-network_ account, we would create all necessary associations in the _core-network_ account.
 
 ```yaml
+# core-network stack
 components:
   terraform:
     tgw/attachment:
       vars:
-        transit_gateway_id: !terraform.output tgw/hub transit_gateway_id
-        transit_gateway_route_table_id: !terraform.output tgw/hub transit_gateway_route_table_id
-        create_transit_gateway_route_table_association: false
-```
+        enabled: true
+        transit_gateway_id: !terraform.output tgw/hub core-usw2-network transit_gateway_id
+        transit_gateway_route_table_id: !terraform.output tgw/hub core-usw2-network transit_gateway_route_table_id
 
-### Network Account Configuration
-
-Example using physical IDs:
-
-```yaml
-components:
-  terraform:
-    tgw/attachment:
-      vars:
-        transit_gateway_id: "tgw-0123456789abcdef0"
-        transit_gateway_route_table_id: "tgw-rtb-0123456789abcdef0"
+        # Add an association for this account itself
         create_transit_gateway_route_table_association: true
 
-        # Additional associations are required for peered connections
+        # Include association for each of the connected accounts, if necessary
         additional_associations:
-          - attachment_id: "tgw-attach-0123456789abcdef1"
-            route_table_id: "tgw-rtb-0123456789abcdef0"
-```
-
-The same configuration using terraform outputs:
-
-```yaml
-components:
-  terraform:
-    tgw/attachment:
-      vars:
-        transit_gateway_id: !terraform.output tgw/hub transit_gateway_id
-        transit_gateway_route_table_id: !terraform.output tgw/hub transit_gateway_route_table_id
-        create_transit_gateway_route_table_association: true
-
-        # Additional associations are required for peered connections
-        additional_associations:
-          - attachment_id: !terraform.output tgw/attachment edge-vpc transit_gateway_attachment_id
+          - attachment_id: !terraform.output tgw/attachment plat-usw2-dev transit_gateway_attachment_id
+            route_table_id: !terraform.output tgw/hub transit_gateway_route_table_id
+          - attachment_id: !terraform.output tgw/attachment plat-usw2-prod transit_gateway_attachment_id
             route_table_id: !terraform.output tgw/hub transit_gateway_route_table_id
 ```
 
-### Multiple Transit Gateway Support
-
-Example using physical IDs:
+In connected accounts, an account that does _not_ have a Transit Gateway and Transit Gateway Route Table, you do not need to create any associations.
 
 ```yaml
+# plat-dev stack
 components:
   terraform:
-    tgw/attachment/nonprod:
-      metadata:
-        component: tgw/attachment
+    tgw/attachment:
       vars:
-        transit_gateway_id: "tgw-0123456789abcdef1"
-        transit_gateway_route_table_id: "tgw-rtb-0123456789abcdef1"
-        create_transit_gateway_route_table_association: false
+        enabled: true
+        transit_gateway_id: !terraform.output tgw/hub core-usw2-network transit_gateway_id
+        transit_gateway_route_table_id: !terraform.output tgw/hub core-usw2-network transit_gateway_route_table_id
 
-    tgw/attachment/prod:
-      metadata:
-        component: tgw/attachment
-      vars:
-        transit_gateway_id: "tgw-0123456789abcdef2"
-        transit_gateway_route_table_id: "tgw-rtb-0123456789abcdef2"
+        # Do not create an association in this account since there is no Transit Gateway Route Table in this account.
         create_transit_gateway_route_table_association: false
 ```
 
-The same configuration using terraform outputs:
+Plus the same for all other connected accounts.
 
-```yaml
-components:
-  terraform:
-    tgw/attachment/nonprod:
-      metadata:
-        component: tgw/attachment
-      vars:
-        transit_gateway_id: !terraform.output tgw/hub transit-use1-nonprod transit_gateway_id
-        transit_gateway_route_table_id: !terraform.output tgw/hub transit-use1-nonprod transit_gateway_route_table_id
-        create_transit_gateway_route_table_association: false
 
-    tgw/attachment/prod:
-      metadata:
-        component: tgw/attachment
-      vars:
-        transit_gateway_id: !terraform.output tgw/hub transit-use1-prod transit_gateway_id
-        transit_gateway_route_table_id: !terraform.output tgw/hub transit-use1-prod transit_gateway_route_table_id
-        create_transit_gateway_route_table_association: false
-```
-
-## Important Notes
-
-1. Route table associations (`create_transit_gateway_route_table_association`) should only be enabled in the network account where the Transit Gateway exists.
-
-2. When connecting to multiple Transit Gateways:
-   - Use clear naming conventions (e.g., `tgw/attachment/prod`, `tgw/attachment/nonprod`)
-   - Configure appropriate VPC routes to direct traffic through the correct Transit Gateway
-
-3. After creating attachments, configure VPC routes using the `vpc-routes` component to enable traffic flow.
-
-<!-- prettier-ignore-start -->
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-disable -->
 ## Requirements
 
 | Name | Version |
@@ -191,12 +134,19 @@ No resources.
 | Name | Description |
 |------|-------------|
 | <a name="output_transit_gateway_vpc_attachment_id"></a> [transit\_gateway\_vpc\_attachment\_id](#output\_transit\_gateway\_vpc\_attachment\_id) | ID of the Transit Gateway VPC Attachment |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-<!-- prettier-ignore-end -->
+<!-- markdownlint-restore -->
+
+
 
 ## References
 
-- [AWS Transit Gateway Documentation](https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html)
-- [cloudposse/terraform-aws-components](TODO) - Cloud Posse's upstream component
 
-[<img src="https://cloudposse.com/logo-300x69.svg" height="32" align="right"/>](https://cpco.io/component)
+- [Cloud Posse Documentation](https://docs.cloudposse.com) - Complete documentation for the Cloud Posse solution
+
+- [Reference Architectures](https://cloudposse.com/) - Launch effortlessly with our turnkey reference architectures, built either by your team or ours.
+
+
+
+
+[<img src="https://cloudposse.com/logo-300x69.svg" height="32" align="right"/>](https://cpco.io/homepage?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-tgw-attachment&utm_content=)
+
