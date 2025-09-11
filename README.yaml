@@ -68,8 +68,7 @@ usage: |-
 
   Plus the same for all other connected accounts.
 
-include:
-  - "docs/terraform.md"
+include: []
 
 tags:
   - terraform
