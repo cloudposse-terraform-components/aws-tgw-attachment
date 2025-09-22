@@ -1,7 +1,7 @@
 # Create a TGW attachment from this account's VPC to the TGW Hub
 module "standard_vpc_attachment" {
   source  = "cloudposse/transit-gateway/aws"
-  version = "0.12.0"
+  version = "0.13.0"
 
   existing_transit_gateway_id             = var.transit_gateway_id
   existing_transit_gateway_route_table_id = var.transit_gateway_route_table_id
