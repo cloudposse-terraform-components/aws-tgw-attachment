@@ -94,7 +94,7 @@ No providers.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_iam_roles"></a> [iam\_roles](#module\_iam\_roles) | ../../account-map/modules/iam-roles | n/a |
-| <a name="module_standard_vpc_attachment"></a> [standard\_vpc\_attachment](#module\_standard\_vpc\_attachment) | cloudposse/transit-gateway/aws | 0.12.0 |
+| <a name="module_standard_vpc_attachment"></a> [standard\_vpc\_attachment](#module\_standard\_vpc\_attachment) | cloudposse/transit-gateway/aws | 0.13.0 |
 | <a name="module_this"></a> [this](#module\_this) | cloudposse/label/null | 0.25.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | cloudposse/stack-config/yaml//modules/remote-state | 1.8.0 |
 
